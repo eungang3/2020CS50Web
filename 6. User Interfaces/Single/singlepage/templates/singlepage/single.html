@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Single Page</title>
+        <script>
+            window.onpopstate = function(event){
+                showSection(event.state.section);
+            }
+
+            function showSection(section){
+                fetch(`sections/${section}`)
+                .then(response => response.text())
+                .then(text => {
+                    document.querySelector('#content').innerHTML = text;
+                })
+            }
+
+            document.addEventListener('DOMContentLoaded', function(){
+                document.querySelectorAll('button').forEach(button => {
+                    button.onclick = function(){
+                        const section = this.dataset.section;
+                        history.pushState({section:section}, "", `section${section}`);
+                        showSection(section);
+                    }
+                })
+            })
+        </script>
+    </head>
+    <body>
+        <button data-section="1">Page1</button>
+        <button data-section="2">Page2</button>
+        <button data-section="3">Page3</button>
+        <div id="content"></div>
+    </body>
+</html>

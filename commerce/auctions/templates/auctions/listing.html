@@ -1,0 +1,116 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {% for message in messages %}
+        {% if message.tags == 'error' %}
+        <div class="alert alert-danger" role="alert">
+            {{ message }}
+        </div>
+        {% else %}
+        <div class="alert alert-success" role="alert">
+            {{ message }}
+        </div>
+        {% endif %}
+    {% endfor %}
+
+    <h2>{{ listing.title }}</h2>
+    
+    {% if user.is_authenticated %}
+    <form action="{% url 'watchlist' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="listing_id" value="{{ listing.id }}">
+        {% if inWatchlist or request.user == listing.owner %}
+        <button type="submit" class="btn btn-outline-secondary btn-sm watchlist" disabled>Add to watchlist</button>
+        {% else %}
+        <button type="submit" class="btn btn-secondary btn-sm watchlist">Add to watchlist</button>
+        {% endif %}
+    </form>
+    {% endif %}
+    
+    <div>
+        <div>
+            <img style="width: 500px;" src="{{ listing.img }}">
+        </div>
+        <p>{{ listing.description }}</p>
+        <p class="h4">$ {{ listing.current_price }}</p>
+        
+        <br/>
+        {% if user.is_authenticated and listing.active %}
+        <p class="h5">Bid</p>
+            {% if request.user == listing.owner %}
+                <form action="{% url 'close_bid' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                    {% if listing.current_price == listing.starting_price %}
+                    <button type="submit" class="btn btn-primary mb-3" disabled>
+                    {% else %}
+                    <button type="submit" class="btn btn-primary mb-3">
+                    {% endif %}
+                    Close bid</button>
+                </form>
+            {% else %}
+                <form action="{% url 'bid' %}" method="post" class="row g-3">
+                    {% csrf_token %}
+                    <div class="col-auto">
+                        {{ BidForm.price }}
+                        <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary mb-3">Bid</button>
+                    </div>
+                </form>
+            {% endif %}
+        {% endif %}
+
+        {% if not listing.active %}
+            {% if request.user == listing.owner %}
+                <div>You closed this listing for {{ listing.winner }} at ${{ listing.current_price }}.</div>
+            {% elif request.user == listing.winner %}
+                <div>{{ listing.winner }} won this listing.</div>
+            {% else %}
+                <div>This listing is now closed.</div>
+            {% endif %}
+        {% endif %}
+        
+        <br/>
+
+        <div>
+            <p class="h5">Details</p>
+            <ul>
+                <li>Listed by: {{ listing.owner }}</li>
+                <li>Category: {{ listing.category }}</li>
+            </ul>
+        </div>
+
+        <br/>
+
+        <div>
+            <p class="h5">Comments</p>
+        </div>
+        {% if user.is_authenticated and listing.active %}
+        <form action="{% url 'comment' %}" method="post" class="row g-3">
+            {% csrf_token %}
+            <div class="col-auto">
+                {{ CommentForm.content }}
+            </div>
+            <input type="hidden" name="listing_id" value="{{ listing.id }}">
+            <div>
+                <button type="submit" class="btn btn-primary mb-3">Comment</button>
+            </div>
+        </form>
+        {% endif %}
+
+        
+        <ul>
+            {% for comment in comments reversed %}
+                <li>
+                    <span>{{ comment.user }} :</span>
+                    <span>{{ comment.content }}<span>
+                </li>
+                
+            {% endfor %}
+        </ul>
+        
+    </div>
+
+{% endblock %}

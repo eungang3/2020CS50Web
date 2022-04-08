@@ -1,0 +1,11 @@
+body {
+    padding: 10px;
+}
+
+.inactive{
+    opacity: 0.5;
+}
+
+.watchlist{
+    margin-bottom: 10px;
+}
