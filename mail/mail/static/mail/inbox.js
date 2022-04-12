@@ -128,7 +128,6 @@ function load_email(id){
   fetch(`/emails/${id}`)
   .then(response => response.json())
   .then(email => {
-    console.log(email)
     const each_email_view = document.querySelector('#each-email-view');
     each_email_view.style.display = 'block';
     each_email_view.innerHTML = '';
@@ -162,12 +161,17 @@ function load_email(id){
     each_email_view.append(body);
 
     // change email as read
-    mark_as_read()
+    mark_as_read(id)
   });
 }
 
-function mark_as_read(){
-  console.log('read')
+function mark_as_read(id){
+  fetch(`/emails/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      read: true
+    })
+  })
 }
 
 function reply(){
