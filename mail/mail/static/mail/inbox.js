@@ -11,18 +11,28 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function compose_email() {
-
+  
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
+  document.querySelector('#each-email-view').style.display = 'none';
 
   // Clear out composition fields
   document.querySelector('#compose-recipients').value = '';
   document.querySelector('#compose-subject').value = '';
   document.querySelector('#compose-body').value = '';
 
-  // when user submits the form
   const form = document.querySelector('form');
+  
+  // if it's reply 
+  if (arguments.length === 4){
+    // subject, body, timestamp, sender
+    document.querySelector('#compose-recipients').value = `${arguments[3]}`;
+    document.querySelector('#compose-subject').value = `RE: ${arguments[1]}`;
+    document.querySelector('#compose-body').value = `On ${arguments[3]} ${arguments[4]} wrote: ${arguments[2]}`;
+  } 
+
+  // when user submits the form
   form.onsubmit = function(){
     
     // get the form values
@@ -45,11 +55,13 @@ function compose_email() {
       load_mailbox('sent');
       })
     return false;
-    }
+  }
 }
 
+
+
 function load_mailbox(mailbox) {
-  
+
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
@@ -150,8 +162,31 @@ function load_email(id){
     
     // add event listener to reply button
     btn.onclick = function(){
-      return reply()
+      return compose_email(email['subject'], email['body'], email['timestamp'], email['sender']);
     }
+
+    // make archive button
+    const abtn = document.createElement('button');
+    if (email['archived']){
+      abtn.innerHTML = 'Unarchive';
+      abtn.className = 'btn btn-outline-secondary';
+      abtn.onclick = function(){
+        unarchive(id);
+        window.location.reload()
+        load_mailbox('inbox');
+      }
+    }
+    else{
+      abtn.innerHTML = 'Archive';
+      abtn.className = 'btn btn-outline-primary';
+      abtn.onclick = function(){
+        archive(id);
+        alert('Archived successfully');
+        window.location.reload()
+        load_mailbox('inbox');
+      }
+    }
+    each_email_view.append(abtn);
 
     // create body of mail
     const hr = document.createElement('hr');
@@ -174,6 +209,20 @@ function mark_as_read(id){
   })
 }
 
-function reply(){
-  console.log('reply')
+function archive(id){
+  fetch(`/emails/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      archived: true
+    })
+  })
+}
+
+function unarchive(id){
+  fetch(`/emails/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      archived: false
+    })
+  })
 }
