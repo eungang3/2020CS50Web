@@ -1,0 +1,16 @@
+.unselected {
+    color: #C0C0C0;
+}
+
+.selected {
+    color: red;
+}
+
+a {
+    color: black;
+}
+
+a:hover {
+    color: black;
+    text-decoration: none;
+}

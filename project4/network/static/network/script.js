@@ -27,6 +27,11 @@ function compose_post(){
         .then(result => {
             console.log(result)
         })
+        
+        // clear fields
+        post.value = '';
+        submitBtn.disabled = true;
+
         return false
     }
 }
