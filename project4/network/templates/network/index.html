@@ -1,0 +1,18 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <!-- New Post -->
+    {% if user.is_authenticated %}
+    <div id="compose-view">
+        <h3>New Post</h3>
+        <form id="compose-form">
+            <div class="form-group">
+                <textarea class="form-control" id="post" placeholder="Write a post."></textarea>
+            </div>
+            <input type="submit" id="submit" class="btn btn-primary" value="post">
+        </form>
+    </div>
+    {% endif %}
+{% endblock %}
+
+
