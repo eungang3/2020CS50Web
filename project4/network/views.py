@@ -1,12 +1,12 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.http import JsonResponse
+from django.shortcuts import HttpResponse, HttpResponseRedirect, render
 from django.urls import reverse
 import json
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+
 from .models import User, Post, Like, Follower
 
 def index(request):
@@ -88,3 +88,14 @@ def compose(request):
 
     return JsonResponse({"message": "post made successfully."}, status=201)
     
+def load_posts(request, posttype):
+    if posttype == 'all':
+        posts = Post.objects.all()
+    
+    elif posttype == 'following':
+        # TO do
+        posts = Post.objects.all()
+    
+    else:
+        return JsonResponse({"error": "Invalid post type."}, status=400)
+    return JsonResponse([post.serialize() for post in posts], safe=False)

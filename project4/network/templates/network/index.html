@@ -1,16 +1,17 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-
-    <!-- New Post -->
+    <div id="title" class="container p-3">
+        All Posts
+    </div>
     {% if user.is_authenticated %}
+    <!-- New Post -->
     <div id="compose-view" class="container p-3">
-        <h1>All Posts</h1>
         <div class="border rounded p-3">
             <h4>New Post</h4>
             <form id="compose-form">
                 <div class="form-group">
-                    <textarea class="form-control" id="post" placeholder="Write a post."></textarea>
+                    <textarea class="form-control" id="post-content" placeholder="Write a post."></textarea>
                 </div>
                 <input type="submit" id="submit" class="btn btn-primary" value="post">
             </form>
@@ -19,18 +20,13 @@
     {% endif %}
 
     <!-- All Posts -->
-    <div id="all-posts" class="container p-3">
-        <div class="border rounded p-3 mb-2">
-            <h5 class="card-title">Writer</h5>
-            <a class="mb-2 text-primary" href="/">Edit</a>
-            <p class="card-text">This is a dummy content</p>
-            <p class="card-text text-muted">timestamp</p>
-            <a href="/">
-                <i class="fa fa-heart unselected"></i> 0
-            </a>
-        </div>
+    <div id="post-view" class="container p-3">
     </div>
     
+    <!-- Profile Page -->
+    <div id="profile-view" class="container p-3">
+    </div>
+
 {% endblock %}
 
 
