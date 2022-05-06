@@ -3,9 +3,11 @@ from django.db import models
 
 
 class User(AbstractUser):
+    id = models.AutoField(primary_key=True)
     pass
 
 class Post(models.Model):
+    id = models.AutoField(primary_key=True)
     writer = models.ForeignKey("User", on_delete=models.CASCADE, related_name="posts")
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True, null=True)

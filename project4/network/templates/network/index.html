@@ -2,10 +2,10 @@
 
 {% block body %}
     <div id="title" class="container p-3">
-        All Posts
+        <h3>All Posts</h3>
     </div>
     {% if user.is_authenticated %}
-    <!-- New Post -->
+    <!-- Compose Post -->
     <div id="compose-view" class="container p-3">
         <div class="border rounded p-3">
             <h4>New Post</h4>
@@ -20,11 +20,7 @@
     {% endif %}
 
     <!-- All Posts -->
-    <div id="post-view" class="container p-3">
-    </div>
-    
-    <!-- Profile Page -->
-    <div id="profile-view" class="container p-3">
+    <div id="all-view" class="container p-3">
     </div>
 
 {% endblock %}

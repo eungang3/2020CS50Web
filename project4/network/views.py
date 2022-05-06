@@ -64,6 +64,18 @@ def register(request):
     else:
         return render(request, "network/register.html")
 
+
+def profile(request, userToRequest):
+    username = request.user
+    return render(request, "network/profile.html", {
+        'username': username,
+        'following': Follower.objects.filter(user=username.id).count(), 
+        'followers': Follower.objects.filter(following=username.id).count()
+    })
+
+
+# functions for api calls 
+
 @csrf_exempt
 @login_required
 def compose(request):
@@ -89,13 +101,19 @@ def compose(request):
     return JsonResponse({"message": "post made successfully."}, status=201)
     
 def load_posts(request, posttype):
-    if posttype == 'all':
-        posts = Post.objects.all()
-    
-    elif posttype == 'following':
-        # TO do
-        posts = Post.objects.all()
+    if request.method == "GET":
+        if posttype == 'all':
+            posts = Post.objects.all()
+        
+        elif posttype == 'profile':
+            userID = request.user.id
+            posts = Post.objects.filter(writer=userID)
+        
+        elif posttype == 'following':
+            # TO do
+            posts = Post.objects.all()
+
+        return JsonResponse([post.serialize() for post in posts], safe=False)
     
     else:
         return JsonResponse({"error": "Invalid post type."}, status=400)
-    return JsonResponse([post.serialize() for post in posts], safe=False)

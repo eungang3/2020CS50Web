@@ -1,0 +1,15 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+<div id="title" class="container p-3">
+    <h3>{{ username }}</h3>
+    {% if user.is_authenticated %}
+        <button class="btn btn-primary">Follow</button>
+    {% endif %}
+    <div>Followers : <span>{{ followers }}</span></div>
+    <div>Following : <span>{{ following }}</span></div>
+</div> 
+
+<div id="profile-view" class="container p-3">
+</div>
+{% endblock %}
