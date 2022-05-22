@@ -8,30 +8,29 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     if (profile_view){
-        load_posts('profile');
+        const id = Number(document.querySelector('#writerid').innerHTML);
+        load_posts('profile', id);
     }
 
     if (following_view){
         load_posts('following');
-    }
-    
-    document.querySelector('#all').addEventListener('click', () => load_posts('all'));
-    document.querySelector('#profile').addEventListener('click', () => load_posts('profile'));
-    document.querySelector('#following').addEventListener('click', () => load_posts('following'));
+    }   
 })
 
-function load_posts(posttype){
+function load_posts(posttype, id){
+
     if (posttype == 'all'){
-        all_view.innerHTML = '';
         compose_post();
     }
-    // send get request for mails
-    fetch(`/load_posts/${posttype}`)
-    .then(response => response.json())
-    .then(posts => {
+    
+    // to load posts for profile page  
+    if (arguments.length === 2){
+        fetch(`/load_profile_posts/${id}`)
+        .then(response => response.json())
+        .then(posts => {
         for (post of posts){
             const postBlock = `<div id="post" class="border rounded p-3 mb-2">
-            <h5 id="writer" class="card-title">${post.writer}</h5>
+            <h5 id="writer" class="card-title"><a href="/profile/${post.writerid}" class="profile-link">${post.writer}</a></h5>
             <a class="mb-2 text-primary" href="/">Edit</a>
             <p id="content" class="card-text">${post.content}</p>
             <p id="timestamp" class="card-text text-muted">${post.timestamp}</p>
@@ -42,6 +41,27 @@ function load_posts(posttype){
             document.querySelector(`#${posttype}-view`).insertAdjacentHTML("afterbegin", postBlock);
             }
         })
+    }
+
+    // to load posts for all page
+    else{
+        fetch(`/load_posts/${posttype}`)
+        .then(response => response.json())
+        .then(posts => {
+            for (post of posts){
+                const postBlock = `<div id="post" class="border rounded p-3 mb-2">
+            <h5 id="writer" class="card-title"><a href="/profile/${post.writerid}" class="profile-link">${post.writer}</a></h5>
+            <a class="mb-2 text-primary" href="/">Edit</a>
+            <p id="content" class="card-text">${post.content}</p>
+            <p id="timestamp" class="card-text text-muted">${post.timestamp}</p>
+            <a href="/">
+                <i class="fa fa-heart unselected"></i> 0
+            </a>
+            </div>`
+            document.querySelector(`#${posttype}-view`).insertAdjacentHTML("afterbegin", postBlock);
+            }
+        })
+    }
     return false;
 }
 

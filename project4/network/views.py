@@ -65,12 +65,12 @@ def register(request):
         return render(request, "network/register.html")
 
 
-def profile(request, userToRequest):
-    username = request.user
+def profile(request, writerid):
     return render(request, "network/profile.html", {
-        'username': username,
-        'following': Follower.objects.filter(user=username.id).count(), 
-        'followers': Follower.objects.filter(following=username.id).count()
+        'writerid': writerid,
+        'username': User.objects.get(id=writerid).username,
+        'following': Follower.objects.filter(user=writerid).count(), 
+        'followers': Follower.objects.filter(following=writerid).count()
     })
 
 
@@ -104,11 +104,7 @@ def load_posts(request, posttype):
     if request.method == "GET":
         if posttype == 'all':
             posts = Post.objects.all()
-        
-        elif posttype == 'profile':
-            userID = request.user.id
-            posts = Post.objects.filter(writer=userID)
-        
+    
         elif posttype == 'following':
             # TO do
             posts = Post.objects.all()
@@ -116,4 +112,11 @@ def load_posts(request, posttype):
         return JsonResponse([post.serialize() for post in posts], safe=False)
     
     else:
+        return JsonResponse({"error": "Invalid post type."}, status=400)
+
+def load_profile_posts(request, id):
+    if request.method =='GET':
+        posts = Post.objects.filter(writer=id)
+        return JsonResponse([post.serialize() for post in posts], safe=False)
+    else: 
         return JsonResponse({"error": "Invalid post type."}, status=400)
