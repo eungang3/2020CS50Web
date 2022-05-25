@@ -10,6 +10,11 @@ document.addEventListener('DOMContentLoaded', function(){
     if (profile_view){
         const id = Number(document.querySelector('#writerid').innerHTML);
         load_posts('profile', id);
+
+        // when user clicks follow btn
+        document.querySelector('#follow').addEventListener('click', () => {
+            follow(id);
+        });
     }
 
     if (following_view){
@@ -43,7 +48,7 @@ function load_posts(posttype, id){
         })
     }
 
-    // to load posts for all page
+    // to load posts for all page, following page
     else{
         fetch(`/load_posts/${posttype}`)
         .then(response => response.json())
@@ -100,6 +105,9 @@ function compose_post(){
     }
     // if user is not logged in
     return false
+}
+
+function follow(id){
 }
 
 /* headers: {'X-CSRFToken': Cookies.get('csrftoken')}, */

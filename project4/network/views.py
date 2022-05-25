@@ -6,6 +6,7 @@ from django.shortcuts import HttpResponse, HttpResponseRedirect, render
 from django.urls import reverse
 import json
 from django.views.decorators.csrf import csrf_exempt
+from django import forms
 
 from .models import User, Post, Like, Follower
 
@@ -64,14 +65,47 @@ def register(request):
     else:
         return render(request, "network/register.html")
 
-
+@login_required
 def profile(request, writerid):
-    return render(request, "network/profile.html", {
-        'writerid': writerid,
-        'username': User.objects.get(id=writerid).username,
-        'following': Follower.objects.filter(user=writerid).count(), 
-        'followers': Follower.objects.filter(following=writerid).count()
-    })
+    if request.method == "GET":
+    # check if logged-in user follows this writer
+    # if so, don't render 'follow' button on html
+        isFollowing = Follower.objects.filter(user=request.user.id, following=writerid).exists()
+        following = Follower.objects.filter(user=writerid)
+        follower = Follower.objects.filter(following=writerid)
+        return render(request, "network/profile.html", {
+            'writerid': writerid,
+            'username': User.objects.get(id=writerid).username,
+            'followings': following, 
+            'followingNum': len(following),
+            'followers': follower,
+            'followerNum': len(follower), 
+            'isFollowing' : isFollowing
+        })
+    
+    # when user clicks follow/unfollow button
+    else: 
+        # in case user clicked follow button
+        if (request.POST['follow'] == 'y'):
+            # update Follower table
+            followerUserObj = User.objects.get(id=request.user.id)
+            followingUserObj = User.objects.get(id=writerid)
+            followerObj = Follower(
+                user = followerUserObj,
+                following = followingUserObj
+            )
+            followerObj.save()
+
+        # in case user clicked unfollow button
+        else:
+            # delete Follower row from the table
+            Follower.objects.filter(user=request.user.id, following=writerid).delete()
+
+        return HttpResponseRedirect(reverse("profile", args=(writerid,)))
+
+@login_required
+def following(request):
+    return render(request, "network/following.html")
 
 
 # functions for api calls 
@@ -106,9 +140,16 @@ def load_posts(request, posttype):
             posts = Post.objects.all()
     
         elif posttype == 'following':
-            # TO do
-            posts = Post.objects.all()
+            currentUser = request.user
 
+            # get list of users that current user follows
+            followingUserobjs = Follower.objects.filter(user=currentUser)
+            posts=[]
+            for followingUser in followingUserobjs:
+                print(followingUser.following)
+
+            # TODO
+            
         return JsonResponse([post.serialize() for post in posts], safe=False)
     
     else:
