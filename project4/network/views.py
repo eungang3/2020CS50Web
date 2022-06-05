@@ -138,19 +138,21 @@ def load_posts(request, posttype):
     if request.method == "GET":
         if posttype == 'all':
             posts = Post.objects.all()
+            return JsonResponse([post.serialize() for post in posts], safe=False)
     
         elif posttype == 'following':
-            currentUser = request.user
-
-            # get list of users that current user follows
-            followingUserobjs = Follower.objects.filter(user=currentUser)
-            posts=[]
-            for followingUser in followingUserobjs:
-                print(followingUser.following)
-
-            # TODO
-            
-        return JsonResponse([post.serialize() for post in posts], safe=False)
+            followings = Follower.objects.filter(user=request.user).values('following')
+            followingIds = [following['following'] for following in followings]
+            posts = []
+            for followingId in followingIds:
+                posts_raw = Post.objects.filter(writer=followingId).values()
+                for post_raw in posts_raw:
+                    writerid = post_raw['writer_id']
+                    post_raw['writer'] = User.objects.get(id=writerid).username
+                    post_raw['writerid'] = writerid
+                    posts.append(post_raw) 
+            result = sorted(posts, key=lambda x:x['id'])
+            return JsonResponse(result, safe=False)
     
     else:
         return JsonResponse({"error": "Invalid post type."}, status=400)

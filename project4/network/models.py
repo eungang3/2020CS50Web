@@ -8,7 +8,7 @@ class User(AbstractUser):
 
 class Post(models.Model):
     id = models.AutoField(primary_key=True)
-    writer = models.ForeignKey("User", on_delete=models.CASCADE, related_name="posts")
+    writer = models.ForeignKey("User", on_delete=models.CASCADE, related_name="writer_id")
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True, null=True)
     
@@ -33,10 +33,19 @@ class Like(models.Model):
     
 
 class Follower(models.Model):
-    user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="follower")
-    following = models.ForeignKey("User", on_delete=models.CASCADE, related_name="user")
+    user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="user_id")
+    following = models.ForeignKey("User", on_delete=models.CASCADE, related_name="following_id")
 
     def __str__(self):
             return f"{self.user} is following {self.following}"
 
     
+"""
+SELECT * 
+FROM Follower 
+JOIN User
+ON following_id = User.id
+JOIN Post
+ON writer_id = following_id
+WHERE (user_id = 1);
+"""

@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function(){
 function load_posts(posttype, id){
 
     if (posttype == 'all'){
+        document.querySelector('#all-view').innerHTML = ''
         compose_post();
     }
     
@@ -93,7 +94,6 @@ function compose_post(){
             })
             .then(response => response.json())
             .then(result => {
-                console.log(result);
                 load_posts('all');
             })
             
@@ -107,8 +107,6 @@ function compose_post(){
     return false
 }
 
-function follow(id){
-}
 
 /* headers: {'X-CSRFToken': Cookies.get('csrftoken')}, */
 
